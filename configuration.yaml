@@ -63,7 +63,7 @@ input_boolean:
         icon: mdi:lightbulb-outline
 
     lamp_value:
-        name: Lamp control value
+        name: Lamp value
         initial: off
         icon: mdi:lightbulb-outline
 
