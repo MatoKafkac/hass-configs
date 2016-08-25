@@ -1,0 +1,105 @@
+homeassistant:
+    # Name of the location where Home Assistant is running
+    name: Home
+    # C for Celcius, F for Fahrenheit
+    unit_system: metric
+
+    # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+    time_zone: Europe/Prague
+
+    customize:
+        input_boolean.fan_value:
+            hidden: true
+        input_boolean.lamp_value:
+            hidden: true
+
+# Enables the frontend
+frontend:
+
+# Checks for available updates
+updater:
+
+# View all events in a logbook
+logbook:
+
+# Allows you to issue voice commands from the frontend
+conversation:
+# Enables support for tracking state changes over time.
+history:
+# Discover some devices automatically
+discovery:
+
+# Show links to resources in log and frontend
+# introduction:
+http:
+  api_password: hovno
+
+
+
+#################################################################
+
+## Components
+
+#################################################################
+input_boolean:
+    override:
+        name: Override all automation
+        initial: off
+        icon: mdi:car
+
+    fan_control:
+        name: Fan control
+        initial: off
+        icon: mdi:fan
+
+    fan_value:
+        name: Fan value
+        initial: off
+        icon: mdi:fan
+
+    lamp_control:
+        name: Lamp control
+        initial: off
+        icon: mdi:lightbulb-outline
+
+    lamp_value:
+        name: Lamp control value
+        initial: off
+        icon: mdi:lightbulb-outline
+
+sensor:
+    - platform: command_line
+      name: temperature 
+      command: cat /home/mato/hass/temp/temperature
+      unit_of_measurement: "°C"
+      value_template: '{{ value }}'
+
+    - platform: command_line
+      name: humidity
+      command: cat /home/mato/hass/temp/humidity
+      unit_of_measurement: "%"
+      value_template: '{{ value }}'
+
+binary_sensor: 
+    - platform: template 
+      sensors:
+        fan:
+            value_template: "{{ states.input_boolean.fan_value.state == 'on' }}"
+            sensor_class: opening
+        lamp:
+            value_template: "{{ states.input_boolean.lamp_value.state == 'on' }}" 
+            sensor_class: light
+
+# Services creation
+shell_command:
+    set_lamp_on: echo "1" > /home/mato/hass/temp/lamp
+    set_lamp_off: echo "0" > /home/mato/hass/temp/lamp
+    set_fan_on: echo "1" > /home/mato/hass/temp/fan
+    set_fan_off: echo "0" > /home/mato/hass/temp/fan
+
+automation: !include automation.yaml
+
+#TODO
+#Napisat python script ktory precita file kde bude cislo incrementuje ho a ulozi
+#Preco nefunguju globalne premmenne jak som si predstavoval teda jak ich prepisat z shellu?
+#Skusit nainstalovat yaml.vim ci nahodou nepomoze s intendami
