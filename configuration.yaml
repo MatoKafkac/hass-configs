@@ -98,8 +98,3 @@ shell_command:
     set_fan_off: echo "0" > /home/mato/hass/temp/fan
 
 automation: !include automation.yaml
-
-#TODO
-#Napisat python script ktory precita file kde bude cislo incrementuje ho a ulozi
-#Preco nefunguju globalne premmenne jak som si predstavoval teda jak ich prepisat z shellu?
-#Skusit nainstalovat yaml.vim ci nahodou nepomoze s intendami
