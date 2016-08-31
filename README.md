@@ -1,8 +1,12 @@
-# home-assistant
-Home automatization
+#Automatization of hydroponic system
 
-Need to create files that are used for simulation of sensors and actuators:
-~/hass/temp/lamp
-~/hass/temp/fan
-~/hass/temp/humidity
-~/hass/temp/temperature
+Use for **virtualenv** in home-assistant  
+
+##Actuators
+- Lamp
+- Fan
+
+##Sensors
+- Temperature
+- Humidity
+
