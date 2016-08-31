@@ -1,1 +1,130 @@
+# HA Startup lamp control logic
+- alias: Start lamp upon HA startup by time
+  trigger:
+    platform: event
+    event_type: homeassistant_start
+  condition:
+    condition: time
+    after: '11:29:00'
+    before: '11:33:00'
+  action:
+    - service: shell_command.set_lamp_on
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.lamp_value
+
+# Lamp control logic
+- alias: Lamp turn on timing
+  trigger:
+    - platform: time
+      after: '11:29:00'
+  condition:
+    - condition: state
+      entity_id: input_boolean.override
+      state: 'off'
+  action: 
+    - service: shell_command.set_lamp_on
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.lamp_value
+
+- alias: Lamp turn off timing
+  trigger:
+    - platform: time
+      after: '11:33:00'
+  condition:
+    - condition: state
+      entity_id: input_boolean.override
+      state: 'off'
+  action: 
+    - service: shell_command.set_lamp_off
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.lamp_value
+
+# Lamp override
+- alias: Lamp on override
+  trigger:
+    platform: state
+    entity_id: input_boolean.lamp_control
+    from: 'off'
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: input_boolean.override
+      state: 'on'
+  action: 
+    - service: shell_command.set_lamp_on
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.lamp_value
+
+- alias: Lamp off override
+  trigger:
+    platform: state
+    entity_id: input_boolean.lamp_control
+    from: 'on'
+    to: 'off'
+  condition:
+    - condition: state
+      entity_id: input_boolean.override
+      state: 'on'
+  action: 
+    - service: shell_command.set_lamp_off
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.lamp_value
+
+- alias: Upon enable override set lamp to current state ON
+  trigger:
+    platform: state
+    entity_id: input_boolean.override
+    from: 'off'
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: input_boolean.lamp_value
+      state: 'on'
+  action: 
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.lamp_control
+
+- alias: Upon enable override set lamp to current state OFF
+  trigger:
+    platform: state
+    entity_id: input_boolean.override
+    from: 'off'
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: input_boolean.lamp_value
+      state: 'off'
+  action: 
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.lamp_control
+
+- alias: Upon disable override return lamp to required state ON
+  trigger:
+    platform: state
+    entity_id: input_boolean.override
+    from: 'on'
+    to: 'off'
+  condition:
+    condition: time
+    after: '11:29:00'
+    before: '11:33:00'
+  action: 
+    - service: shell_command.set_lamp_on
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.lamp_value
+
+- alias: Upon disable override return lamp to required state OFF
+  trigger:
+    platform: state
+    entity_id: input_boolean.override
+    from: 'on'
+    to: 'off'
+  condition:
+    condition: time
+    after: '11:33:00'
+    before: '11:29:00'
+  action: 
+    - service: shell_command.set_lamp_off
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.lamp_value
 
