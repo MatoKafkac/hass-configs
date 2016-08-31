@@ -111,7 +111,3 @@ shell_command:
 
 automation: !include_dir_merge_list automation
 
-#TODO
-#Napisat python script ktory precita file kde bude cislo incrementuje ho a ulozi
-#Preco nefunguju globalne premmenne jak som si predstavoval teda jak ich prepisat z shellu?
-#Skusit nainstalovat yaml.vim ci nahodou nepomoze s intendami
