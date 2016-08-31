@@ -5,8 +5,8 @@
     event_type: homeassistant_start
   condition:
     condition: time
-    after: '11:29:00'
-    before: '11:33:00'
+    after: !env_var HA_TIME_LAMP_ON_THRESHOLD
+    before: !env_var HA_TIME_LAMP_OFF_THRESHOLD
   action:
     - service: shell_command.set_lamp_on
     - service: input_boolean.turn_on
@@ -16,7 +16,7 @@
 - alias: Lamp turn on timing
   trigger:
     - platform: time
-      after: '11:29:00'
+      after: !env_var HA_TIME_LAMP_ON_THRESHOLD
   condition:
     - condition: state
       entity_id: input_boolean.override
@@ -29,7 +29,7 @@
 - alias: Lamp turn off timing
   trigger:
     - platform: time
-      after: '11:33:00'
+      after: !env_var HA_TIME_LAMP_OFF_THRESHOLD
   condition:
     - condition: state
       entity_id: input_boolean.override
@@ -106,8 +106,8 @@
     to: 'off'
   condition:
     condition: time
-    after: '11:29:00'
-    before: '11:33:00'
+    after: !env_var HA_TIME_LAMP_ON_THRESHOLD
+    before: !env_var HA_TIME_LAMP_OFF_THRESHOLD
   action: 
     - service: shell_command.set_lamp_on
     - service: input_boolean.turn_on
@@ -121,8 +121,8 @@
     to: 'off'
   condition:
     condition: time
-    after: '11:33:00'
-    before: '11:29:00'
+    after: !env_var HA_TIME_LAMP_OFF_THRESHOLD
+    before: !env_var HA_TIME_LAMP_ON_THRESHOLD
   action: 
     - service: shell_command.set_lamp_off
     - service: input_boolean.turn_off

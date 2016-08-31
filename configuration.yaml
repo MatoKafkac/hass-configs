@@ -13,9 +13,9 @@ homeassistant:
         input_boolean.lamp_value:
             hidden: true
         binary_sensor.trigger_temperature:
-            hidden: true
+            hidden: false
         binary_sensor.trigger_humidity:
-            hidden: true
+            hidden: false
 
 # Enables the frontend
 frontend:
@@ -79,8 +79,20 @@ sensor:
       value_template: '{{ value }}'
 
     - platform: command_line
+      name: temperature_fan_threshold
+      command: printenv HA_TEMPERATURE_FAN_THRESHOLD
+      unit_of_measurement: "°C"
+      value_template: '{{ value }}'
+
+    - platform: command_line
       name: humidity
       command: cat ~/hass/temp/humidity
+      unit_of_measurement: "%"
+      value_template: '{{ value }}'
+
+    - platform: command_line
+      name: humidity_fan_threshold
+      command: printenv HA_HUMIDITY_FAN_THRESHOLD
       unit_of_measurement: "%"
       value_template: '{{ value }}'
 
@@ -97,10 +109,10 @@ binary_sensor:
             sensor_class: light
         trigger_temperature:
             friendly_name: TrigTemp
-            value_template: "{{ states.sensor.temperature.state | float > 40 }}"
+            value_template: "{{ float(states.sensor.temperature.state) > float(states.sensor.temperature_fan_threshold.state) }}"
         trigger_humidity:
             friendly_name: TrigHum
-            value_template: "{{ states.sensor.humidity.state | float > 40 }}"
+            value_template: "{{ float(states.sensor.humidity.state) > float(states.sensor.humidity_fan_threshold.state) }}"
 
 # Services creation
 shell_command:

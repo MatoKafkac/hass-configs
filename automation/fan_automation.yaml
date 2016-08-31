@@ -7,9 +7,9 @@
       condition: or
       conditions:
         - condition: template
-          value_template: '{{ states.sensor.temperature.state | float > 40 }}'
+          value_template: '{{ float(states.sensor.temperature.state) > float(states.sensor.temperature_fan_threshold.state) }}'
         - condition: template
-          value_template: '{{ states.sensor.humidity.state | float > 40 }}'
+          value_template: '{{ float(states.sensor.humidity.state) > float(states.sensor.humidity_fan_threshold.state) }}'
   action:
     - service: shell_command.set_fan_on
     - service: input_boolean.turn_on
@@ -22,7 +22,7 @@
       entity_id: binary_sensor.trigger_temperature
       to: 'on'
       for:
-          seconds: 5
+          seconds: !env_var HA_TIME_HYSTERESIS_TEMPERATURE
   condition:
     - condition: state
       entity_id: input_boolean.override
@@ -38,7 +38,7 @@
     entity_id: binary_sensor.trigger_humidity
     to: 'on'
     for:
-        seconds: 5
+        seconds: !env_var HA_TIME_HYSTERESIS_HUMIDITY
   condition:
     - condition: state
       entity_id: input_boolean.override
@@ -54,7 +54,7 @@
     entity_id: binary_sensor.trigger_temperature
     to: 'off'
     for:
-        seconds: 5
+        seconds: !env_var HA_TIME_HYSTERESIS_TEMPERATURE
   condition:
       condition: and
       conditions:
@@ -75,7 +75,7 @@
     entity_id: binary_sensor.trigger_humidity
     to: 'off'
     for:
-        seconds: 5
+        seconds: !env_var HA_TIME_HYSTERESIS_HUMIDITY
   condition:
       condition: and
       conditions:
@@ -159,9 +159,9 @@
       condition: or
       conditions:
         - condition: template
-          value_template: '{{ states.sensor.temperature.state | float > 40 }}'
+          value_template: '{{ float(states.sensor.temperature.state) > float(states.sensor.temperature_fan_threshold.state) }}'
         - condition: template
-          value_template: '{{ states.sensor.humidity.state | float > 40 }}'
+          value_template: '{{ float(states.sensor.humidity.state) > float(states.sensor.humidity_fan_threshold.state) }}'
   action: 
     - service: shell_command.set_fan_on
     - service: input_boolean.turn_on
@@ -177,9 +177,9 @@
       condition: and
       conditions:
         - condition: template
-          value_template: '{{ states.sensor.temperature.state | float < 40 }}'
+          value_template: '{{ float(states.sensor.temperature.state) < float(states.sensor.temperature_fan_threshold.state) }}'
         - condition: template
-          value_template: '{{ states.sensor.humidity.state | float < 40 }}'
+          value_template: '{{ float(states.sensor.humidity.state) < float(states.sensor.humidity_fan_threshold.state) }}'
   action: 
     - service: shell_command.set_fan_off
     - service: input_boolean.turn_off
