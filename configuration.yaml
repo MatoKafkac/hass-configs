@@ -12,6 +12,10 @@ homeassistant:
             hidden: true
         input_boolean.lamp_value:
             hidden: true
+        binary_sensor.trigger_temperature:
+            hidden: true
+        binary_sensor.trigger_humidity:
+            hidden: true
 
 # Enables the frontend
 frontend:
@@ -69,14 +73,14 @@ input_boolean:
 
 sensor:
     - platform: command_line
-      name: temperature 
-      command: cat /home/mato/hass/temp/temperature
+      name: temperature
+      command: cat ~/hass/temp/temperature
       unit_of_measurement: "°C"
       value_template: '{{ value }}'
 
     - platform: command_line
       name: humidity
-      command: cat /home/mato/hass/temp/humidity
+      command: cat ~/hass/temp/humidity
       unit_of_measurement: "%"
       value_template: '{{ value }}'
 
@@ -84,17 +88,26 @@ binary_sensor:
     - platform: template 
       sensors:
         fan:
+            friendly_name: Fan
             value_template: "{{ states.input_boolean.fan_value.state == 'on' }}"
             sensor_class: opening
         lamp:
+            friendly_name: Lamp
             value_template: "{{ states.input_boolean.lamp_value.state == 'on' }}" 
             sensor_class: light
+        trigger_temperature:
+            friendly_name: TrigTemp
+            value_template: "{{ states.sensor.temperature.state | float > 40 }}"
+        trigger_humidity:
+            friendly_name: TrigHum
+            value_template: "{{ states.sensor.humidity.state | float > 40 }}"
 
 # Services creation
 shell_command:
-    set_lamp_on: echo "1" > /home/mato/hass/temp/lamp
-    set_lamp_off: echo "0" > /home/mato/hass/temp/lamp
-    set_fan_on: echo "1" > /home/mato/hass/temp/fan
-    set_fan_off: echo "0" > /home/mato/hass/temp/fan
+    set_lamp_on: echo "1" > ~/hass/temp/lamp
+    set_lamp_off: echo "0" > ~/hass/temp/lamp
+    set_fan_on: echo "1" > ~/hass/temp/fan
+    set_fan_off: echo "0" > ~/hass/temp/fan
 
-automation: !include automation.yaml
+automation: !include_dir_merge_list automation
+
