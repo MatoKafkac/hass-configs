@@ -13,9 +13,13 @@ homeassistant:
         input_boolean.lamp_value:
             hidden: true
         binary_sensor.trigger_temperature:
-            hidden: false
+            hidden: true
         binary_sensor.trigger_humidity:
-            hidden: false
+            hidden: true
+        sensor.temperature_fan_threshold:
+            hidden: true
+        sensor.humidity_fan_threshold:
+            hidden: true
 
 # Enables the frontend
 frontend:
