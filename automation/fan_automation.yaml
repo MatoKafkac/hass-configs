@@ -7,9 +7,9 @@
       condition: or
       conditions:
         - condition: template
-          value_template: '{{ float(states.sensor.temperature.state) > float(states.sensor.temperature_fan_threshold.state) }}'
+          value_template: "{{ float(states.sensor.temperature.state) > (float(states.input_slider.temperature_fan_threshold.state) + float(states.input_slider.temperature_fan_hysteresis.state)) }}"
         - condition: template
-          value_template: '{{ float(states.sensor.humidity.state) > float(states.sensor.humidity_fan_threshold.state) }}'
+          value_template: "{{ float(states.sensor.humidity.state) > (float(states.input_slider.humidity_fan_threshold.state) + float(states.input_slider.humidity_fan_hysteresis.state)) }}"
   action:
     - service: shell_command.set_fan_on
     - service: input_boolean.turn_on
@@ -19,10 +19,8 @@
 - alias: Start fan by temperature
   trigger:
     - platform: state
-      entity_id: binary_sensor.trigger_temperature
+      entity_id: binary_sensor.trigger_on_temperature
       to: 'on'
-      for:
-          seconds: !env_var HA_TIME_HYSTERESIS_TEMPERATURE
   condition:
     - condition: state
       entity_id: input_boolean.override
@@ -35,10 +33,8 @@
 - alias: Start fan by humidity
   trigger:
     platform: state
-    entity_id: binary_sensor.trigger_humidity
+    entity_id: binary_sensor.trigger_on_humidity
     to: 'on'
-    for:
-        seconds: !env_var HA_TIME_HYSTERESIS_HUMIDITY
   condition:
     - condition: state
       entity_id: input_boolean.override
@@ -51,10 +47,8 @@
 - alias: Stop fan by temperature
   trigger:
     platform: state
-    entity_id: binary_sensor.trigger_temperature
+    entity_id: binary_sensor.trigger_off_temperature
     to: 'off'
-    for:
-        seconds: !env_var HA_TIME_HYSTERESIS_TEMPERATURE
   condition:
       condition: and
       conditions:
@@ -62,7 +56,7 @@
           entity_id: input_boolean.override
           state: 'off'
         - condition: state
-          entity_id: binary_sensor.trigger_humidity
+          entity_id: binary_sensor.trigger_on_humidity
           state: 'off' 
   action: 
     - service: shell_command.set_fan_off
@@ -72,10 +66,8 @@
 - alias: Stop fan by humidity
   trigger:
     platform: state
-    entity_id: binary_sensor.trigger_humidity
+    entity_id: binary_sensor.trigger_off_humidity
     to: 'off'
-    for:
-        seconds: !env_var HA_TIME_HYSTERESIS_HUMIDITY
   condition:
       condition: and
       conditions:
@@ -83,7 +75,7 @@
           entity_id: input_boolean.override
           state: 'off'
         - condition: state
-          entity_id: binary_sensor.trigger_temperature
+          entity_id: binary_sensor.trigger_on_temperature
           state: 'off'
   action: 
     - service: shell_command.set_fan_off
@@ -149,6 +141,7 @@
     - service: input_boolean.turn_off
       entity_id: input_boolean.fan_control
 
+#TODO Condition done by state of binary sensor trigger_on/off?
 - alias: Upon disable override return fan to required state ON
   trigger:
     platform: state
@@ -159,9 +152,9 @@
       condition: or
       conditions:
         - condition: template
-          value_template: '{{ float(states.sensor.temperature.state) > float(states.sensor.temperature_fan_threshold.state) }}'
+          value_template: "{{ float(states.sensor.temperature.state) > (float(states.input_slider.temperature_fan_threshold.state) + float(states.input_slider.temperature_fan_hysteresis.state)) }}"
         - condition: template
-          value_template: '{{ float(states.sensor.humidity.state) > float(states.sensor.humidity_fan_threshold.state) }}'
+          value_template: "{{ float(states.sensor.humidity.state) > (float(states.input_slider.humidity_fan_threshold.state) + float(states.input_slider.humidity_fan_hysteresis.state)) }}"
   action: 
     - service: shell_command.set_fan_on
     - service: input_boolean.turn_on
@@ -177,9 +170,9 @@
       condition: and
       conditions:
         - condition: template
-          value_template: '{{ float(states.sensor.temperature.state) < float(states.sensor.temperature_fan_threshold.state) }}'
+          value_template: "{{ float(states.sensor.temperature.state) > (float(states.input_slider.temperature_fan_threshold.state) - float(states.input_slider.temperature_fan_hysteresis.state)) }}"
         - condition: template
-          value_template: '{{ float(states.sensor.humidity.state) < float(states.sensor.humidity_fan_threshold.state) }}'
+          value_template: "{{ float(states.sensor.humidity.state) > (float(states.input_slider.humidity_fan_threshold.state) - float(states.input_slider.humidity_fan_hysteresis.state)) }}"
   action: 
     - service: shell_command.set_fan_off
     - service: input_boolean.turn_off

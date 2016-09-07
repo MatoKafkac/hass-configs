@@ -15,8 +15,8 @@
 # Lamp control logic
 - alias: Lamp turn on timing
   trigger:
-    - platform: time
-      after: !env_var HA_TIME_LAMP_ON_THRESHOLD
+    - platform: template
+      value_template: '{{ states.sensor.time.state == states.sensor.time_lamp_on.state }}'
   condition:
     - condition: state
       entity_id: input_boolean.override
@@ -28,8 +28,8 @@
 
 - alias: Lamp turn off timing
   trigger:
-    - platform: time
-      after: !env_var HA_TIME_LAMP_OFF_THRESHOLD
+    - platform: template
+      value_template: '{{ states.sensor.time.state == states.sensor.time_lamp_off.state }}'
   condition:
     - condition: state
       entity_id: input_boolean.override
