@@ -1,19 +1,24 @@
 # HA Startup lamp control logic
-- alias: Start lamp upon HA startup by time
+- alias: ----- Start lamp upon HA startup by time -----
+  hide_entity: True
   trigger:
     platform: event
     event_type: homeassistant_start
   condition:
-    condition: time
-    after: !env_var HA_TIME_LAMP_ON_THRESHOLD
-    before: !env_var HA_TIME_LAMP_OFF_THRESHOLD
+    condition: and
+    conditions:
+    - condition: template
+      value_template: '{{ states.sensor.time.state > states.sensor.time_lamp_on.state }}'
+    - condition: template
+      value_template: '{{ states.sensor.time.state < states.sensor.time_lamp_off.state }}'
   action:
     - service: shell_command.set_lamp_on
     - service: input_boolean.turn_on
       entity_id: input_boolean.lamp_value
 
 # Lamp control logic
-- alias: Lamp turn on timing
+- alias: ----- Lamp turn on timing -----
+  hide_entity: True
   trigger:
     - platform: template
       value_template: '{{ states.sensor.time.state == states.sensor.time_lamp_on.state }}'
@@ -26,7 +31,8 @@
     - service: input_boolean.turn_on
       entity_id: input_boolean.lamp_value
 
-- alias: Lamp turn off timing
+- alias: ----- Lamp turn off timing -----
+  hide_entity: True
   trigger:
     - platform: template
       value_template: '{{ states.sensor.time.state == states.sensor.time_lamp_off.state }}'
@@ -40,7 +46,8 @@
       entity_id: input_boolean.lamp_value
 
 # Lamp override
-- alias: Lamp on override
+- alias: ----- Lamp on override -----
+  hide_entity: True
   trigger:
     platform: state
     entity_id: input_boolean.lamp_control
@@ -55,7 +62,8 @@
     - service: input_boolean.turn_on
       entity_id: input_boolean.lamp_value
 
-- alias: Lamp off override
+- alias: ----- Lamp off override -----
+  hide_entity: True
   trigger:
     platform: state
     entity_id: input_boolean.lamp_control
@@ -70,7 +78,8 @@
     - service: input_boolean.turn_off
       entity_id: input_boolean.lamp_value
 
-- alias: Upon enable override set lamp to current state ON
+- alias: ----- Upon enable override set lamp to current state ON -----
+  hide_entity: True
   trigger:
     platform: state
     entity_id: input_boolean.override
@@ -84,7 +93,8 @@
     - service: input_boolean.turn_on
       entity_id: input_boolean.lamp_control
 
-- alias: Upon enable override set lamp to current state OFF
+- alias: ----- Upon enable override set lamp to current state OFF -----
+  hide_entity: True
   trigger:
     platform: state
     entity_id: input_boolean.override
@@ -98,31 +108,39 @@
     - service: input_boolean.turn_off
       entity_id: input_boolean.lamp_control
 
-- alias: Upon disable override return lamp to required state ON
+- alias: ----- Upon disable override return lamp to required state ON -----
+  hide_entity: True
   trigger:
     platform: state
     entity_id: input_boolean.override
     from: 'on'
     to: 'off'
   condition:
-    condition: time
-    after: !env_var HA_TIME_LAMP_ON_THRESHOLD
-    before: !env_var HA_TIME_LAMP_OFF_THRESHOLD
+    condition: and
+    conditions:
+    - condition: template
+      value_template: '{{ states.sensor.time.state > states.sensor.time_lamp_on.state }}'
+    - condition: template
+      value_template: '{{ states.sensor.time.state < states.sensor.time_lamp_off.state }}'
   action: 
     - service: shell_command.set_lamp_on
     - service: input_boolean.turn_on
       entity_id: input_boolean.lamp_value
 
-- alias: Upon disable override return lamp to required state OFF
+- alias: ----- Upon disable override return lamp to required state OFF -----
+  hide_entity: True
   trigger:
     platform: state
     entity_id: input_boolean.override
     from: 'on'
     to: 'off'
   condition:
-    condition: time
-    after: !env_var HA_TIME_LAMP_OFF_THRESHOLD
-    before: !env_var HA_TIME_LAMP_ON_THRESHOLD
+    condition: and
+    conditions:
+    - condition: template
+      value_template: '{{ states.sensor.time.state > states.sensor.time_lamp_on.state }}'
+    - condition: template
+      value_template: '{{ states.sensor.time.state < states.sensor.time_lamp_off.state }}'
   action: 
     - service: shell_command.set_lamp_off
     - service: input_boolean.turn_off
