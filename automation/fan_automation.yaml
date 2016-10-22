@@ -1,5 +1,6 @@
 # HA Startup fan control logic
-- alias: Start fan upon HA startup by temperature and humidity
+- alias: ----- Start fan upon HA startup by temperature and humidity -----
+  hide_entity: True
   trigger:
     platform: event
     event_type: homeassistant_start
@@ -16,7 +17,8 @@
       entity_id: input_boolean.fan_value
 
 # Fan control logic
-- alias: Start fan by temperature
+- alias: ----- Start fan by temperature -----
+  hide_entity: True
   trigger:
     - platform: state
       entity_id: binary_sensor.trigger_on_temperature
@@ -30,7 +32,8 @@
     - service: input_boolean.turn_on
       entity_id: input_boolean.fan_value
 
-- alias: Start fan by humidity
+- alias: ----- Start fan by humidity -----
+  hide_entity: True
   trigger:
     platform: state
     entity_id: binary_sensor.trigger_on_humidity
@@ -44,7 +47,8 @@
     - service: input_boolean.turn_on
       entity_id: input_boolean.fan_value
 
-- alias: Stop fan by temperature
+- alias: ----- Stop fan by temperature -----
+  hide_entity: True
   trigger:
     platform: state
     entity_id: binary_sensor.trigger_off_temperature
@@ -63,7 +67,8 @@
     - service: input_boolean.turn_off
       entity_id: input_boolean.fan_value
 
-- alias: Stop fan by humidity
+- alias: ----- Stop fan by humidity -----
+  hide_entity: True
   trigger:
     platform: state
     entity_id: binary_sensor.trigger_off_humidity
@@ -83,7 +88,8 @@
       entity_id: input_boolean.fan_value
 
 # Fan override
-- alias: Fan on override
+- alias: ----- Fan on override -----
+  hide_entity: True
   trigger:
     platform: state
     entity_id: input_boolean.fan_control
@@ -98,7 +104,8 @@
     - service: input_boolean.turn_on
       entity_id: input_boolean.fan_value
 
-- alias: Fan off override
+- alias: ----- Fan off override -----
+  hide_entity: True
   trigger:
     platform: state
     entity_id: input_boolean.fan_control
@@ -113,7 +120,8 @@
     - service: input_boolean.turn_off
       entity_id: input_boolean.fan_value
 
-- alias: Upon enable override set fan to current state ON
+- alias: ----- Upon enable override set fan to current state ON -----
+  hide_entity: True
   trigger:
     platform: state
     entity_id: input_boolean.override
@@ -127,7 +135,8 @@
     - service: input_boolean.turn_on
       entity_id: input_boolean.fan_control
 
-- alias: Upon enable override set fan to current state OFF
+- alias: ----- Upon enable override set fan to current state OFF -----
+  hide_entity: True
   trigger:
     platform: state
     entity_id: input_boolean.override
@@ -142,7 +151,8 @@
       entity_id: input_boolean.fan_control
 
 #TODO Condition done by state of binary sensor trigger_on/off?
-- alias: Upon disable override return fan to required state ON
+- alias: ----- Upon disable override return fan to required state ON -----
+  hide_entity: True
   trigger:
     platform: state
     entity_id: input_boolean.override
@@ -160,7 +170,8 @@
     - service: input_boolean.turn_on
       entity_id: input_boolean.fan_value
 
-- alias: Upon disable override return fan to required state OFF
+- alias: ----- Upon disable override return fan to required state OFF -----
+  hide_entity: True
   trigger:
     platform: state
     entity_id: input_boolean.override
