@@ -1,0 +1,182 @@
+# HA Startup fan control logic
+- alias: ----- Start fan upon HA startup by temperature and humidity -----
+  hide_entity: True
+  trigger:
+    platform: event
+    event_type: homeassistant_start
+  condition:
+      condition: or
+      conditions:
+        - condition: template
+          value_template: "{{ float(states.sensor.hydro_temperature.state) > (float(states.input_slider.temperature_fan_threshold.state) + float(states.input_slider.temperature_fan_hysteresis.state)) }}"
+        - condition: template
+          value_template: "{{ float(states.sensor.hydro_humidity.state) > (float(states.input_slider.humidity_fan_threshold.state) + float(states.input_slider.humidity_fan_hysteresis.state)) }}"
+  action:
+    - service: switch.turn_on
+      entity_id: switch.fan_value
+
+# Fan control logic
+- alias: ----- Start fan by temperature -----
+  hide_entity: True
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.trigger_on_temperature
+      to: 'on'
+  condition:
+    - condition: state
+      entity_id: input_boolean.override
+      state: 'off'
+  action: 
+    - service: switch.turn_on
+      entity_id: switch.fan_value
+
+- alias: ----- Start fan by humidity -----
+  hide_entity: True
+  trigger:
+    platform: state
+    entity_id: binary_sensor.trigger_on_humidity
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: input_boolean.override
+      state: 'off'
+  action: 
+    - service: switch.turn_on
+      entity_id: switch.fan_value
+
+- alias: ----- Stop fan by temperature -----
+  hide_entity: True
+  trigger:
+    platform: state
+    entity_id: binary_sensor.trigger_off_temperature
+    to: 'off'
+  condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.override
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.trigger_on_humidity
+          state: 'off' 
+  action: 
+    - service: switch.turn_off
+      entity_id: switch.fan_value
+
+- alias: ----- Stop fan by humidity -----
+  hide_entity: True
+  trigger:
+    platform: state
+    entity_id: binary_sensor.trigger_off_humidity
+    to: 'off'
+  condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.override
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.trigger_on_temperature
+          state: 'off'
+  action: 
+    - service: switch.turn_off
+      entity_id: switch.fan_value
+
+# Fan override
+- alias: ----- Fan on override -----
+  hide_entity: True
+  trigger:
+    platform: state
+    entity_id: input_boolean.fan_control
+    from: 'off'
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: input_boolean.override
+      state: 'on'
+  action: 
+    - service: switch.turn_on
+      entity_id: switch.fan_value
+
+- alias: ----- Fan off override -----
+  hide_entity: True
+  trigger:
+    platform: state
+    entity_id: input_boolean.fan_control
+    from: 'on'
+    to: 'off'
+  condition:
+    - condition: state
+      entity_id: input_boolean.override
+      state: 'on'
+  action: 
+    - service: switch.turn_off
+      entity_id: switch.fan_value
+
+- alias: ----- Upon enable override set fan to current state ON -----
+  hide_entity: True
+  trigger:
+    platform: state
+    entity_id: input_boolean.override
+    from: 'off'
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: switch.fan_value
+      state: 'on'
+  action: 
+    - service: input_boolean.turn_on
+      entity_id: input_boolean.fan_control
+
+- alias: ----- Upon enable override set fan to current state OFF -----
+  hide_entity: True
+  trigger:
+    platform: state
+    entity_id: input_boolean.override
+    from: 'off'
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: switch.fan_value
+      state: 'off'
+  action: 
+    - service: input_boolean.turn_off
+      entity_id: input_boolean.fan_control
+
+#TODO Condition done by state of binary sensor trigger_on/off?
+- alias: ----- Upon disable override return fan to required state ON -----
+  hide_entity: True
+  trigger:
+    platform: state
+    entity_id: input_boolean.override
+    from: 'on'
+    to: 'off'
+  condition:
+      condition: or
+      conditions:
+        - condition: template
+          value_template: "{{ float(states.sensor.hydro_temperature.state) > (float(states.input_slider.temperature_fan_threshold.state) + float(states.input_slider.temperature_fan_hysteresis.state)) }}"
+        - condition: template
+          value_template: "{{ float(states.sensor.hydro_humidity.state) > (float(states.input_slider.humidity_fan_threshold.state) + float(states.input_slider.humidity_fan_hysteresis.state)) }}"
+  action: 
+    - service: switch.turn_on
+      entity_id: switch.fan_value
+
+- alias: ----- Upon disable override return fan to required state OFF -----
+  hide_entity: True
+  trigger:
+    platform: state
+    entity_id: input_boolean.override
+    from: 'on'
+    to: 'off'
+  condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ float(states.sensor.hydro_temperature.state) > (float(states.input_slider.temperature_fan_threshold.state) - float(states.input_slider.temperature_fan_hysteresis.state)) }}"
+        - condition: template
+          value_template: "{{ float(states.sensor.hydro_humidity.state) > (float(states.input_slider.humidity_fan_threshold.state) - float(states.input_slider.humidity_fan_hysteresis.state)) }}"
+  action: 
+    - service: switch.turn_off
+      entity_id: switch.fan_value
+

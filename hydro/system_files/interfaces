@@ -1,0 +1,39 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+#auto eth0
+#iface eth0 inet dhcp
+# Example to keep MAC address between reboots
+#hwaddress ether DE:AD:BE:EF:CA:FE
+
+# The secondary network interface
+#auto eth1
+#iface eth1 inet dhcp
+
+# WiFi Example
+# MV3 CHANGE UNCOMMENTED
+#auto wlan0
+iface wlan0 inet dhcp
+#iface wlan0 inet static
+    address 192.168.1.19
+    netmask 255.255.255.0
+    gateway 192.168.1.1
+#    pre-up rfkill unblock all
+#    wpa-ssid  "robotice"
+#    wpa-psk   "mattonijesteje"
+    wpa-ssid "UPC032351"
+    wpa-psk  "MUCNHICT"
+#    wpa-psk 10cdcba3278733885e8f09adb6a4439e8ed2626f2aa91f3409382134f38e
+
+# Ethernet/RNDIS gadget (g_ether)
+# Used by: /opt/scripts/boot/autoconfigure_usb0.sh
+iface usb0 inet static
+    address 192.168.7.2
+    netmask 255.255.255.252
+    network 192.168.7.0
+    gateway 192.168.7.1

@@ -1,0 +1,23 @@
+# This is a simple service file for systems with systemd to tun HA as user.
+#
+# For details please check https://home-assistant.io/getting-started/autostart/
+#
+[Unit]
+Description=Home Assistant for %i
+After=network.target
+
+[Service]
+Type=simple
+User=%i
+# Enable the following line if you get network-related HA errors during boot
+ExecStartPre=/bin/sleep 60
+ExecStartPre=/bin/sleep 60
+# Use `whereis hass` to determine the path of hass
+# MV3 ADDED
+#ExecStart=/usr/bin/hass --runner
+ExecStart=/home/mato/hass/hydro_hass.sh
+SendSIGKILL=no
+RestartForceExitStatus=100
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,287 @@
+homeassistant:
+    # Name of the location where Home Assistant is running
+    name: Home
+    # C for Celcius, F for Fahrenheit
+    unit_system: metric
+
+    # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+    time_zone: Europe/Prague
+
+    customize:
+        switch.fan_value:
+            hidden: false
+        switch.lamp_value:
+            hidden: false
+        binary_sensor.trigger_on_temperature:
+            hidden: true
+        binary_sensor.trigger_off_temperature:
+            hidden: true
+        binary_sensor.trigger_on_humidity:
+            hidden: true
+        binary_sensor.trigger_off_humidity:
+            hidden: true
+
+# Enables the frontend
+frontend:
+
+# Checks for available updates
+updater:
+
+# View all events in a logbook
+logbook:
+
+# Allows you to issue voice commands from the frontend
+conversation:
+# Enables support for tracking state changes over time.
+history:
+# Discover some devices automatically
+discovery:
+
+# Show links to resources in log and frontend
+# introduction:
+http:
+  api_password: hovno
+
+
+
+#################################################################
+
+## Components
+
+#################################################################
+switch:
+  - platform: rpi_gpio
+    ports:
+      7: LED Red
+      60: LED Green
+    invert_logic: false
+
+  - platform: rpi_gpio
+    ports:
+      26: Lamp value
+      46: Fan value
+    invert_logic: true
+
+input_boolean:
+    override:
+        name: Override all automation
+        initial: off
+        icon: mdi:car
+
+    fan_control:
+        name: Fan control
+        initial: off
+        icon: mdi:fan
+
+    lamp_control:
+        name: Lamp control
+        initial: off
+        icon: mdi:lightbulb-outline
+
+sensor:
+    - platform: dht
+      sensor: DHT22
+      pin: P8_18
+      name: Hydro
+      monitored_conditions:
+        - temperature
+        - humidity
+
+    - platform: time_date
+      display_options:
+        - 'time'
+
+    - platform: template
+      sensors:
+        time_lamp_on:
+            friendly_name: Lamp time ON
+            #value_template: "{% if states.input_slider.time_lamp_on_hour.state | int < 10 %}0{% endif %}{{ states.input_slider.time_lamp_on_hour.state | int }}:{% if states.input_slider.time_lamp_on_minute.state | int < 10 %}0{% endif %}{{ states.input_slider.time_lamp_on_minute.state | int }}"
+            value_template:
+                "{% if states.input_slider.time_lamp_on_hour and states.input_slider.time_lamp_on_minute %}
+                {{ '%0.02d:%0.02d' | format(states.input_slider.time_lamp_on_hour.state | int, states.input_slider.time_lamp_on_minute.state | int) }}
+                {% else %}
+                n/a
+                {% endif %}"
+        time_lamp_off:
+            friendly_name: Lamp time OFF
+            #value_template: "{% if states.input_slider.time_lamp_off_hour.state | int < 10 %}0{% endif %}{{ states.input_slider.time_lamp_off_hour.state | int }}:{% if states.input_slider.time_lamp_off_minute.state | int < 10 %}0{% endif %}{{ states.input_slider.time_lamp_off_minute.state | int }}"
+            value_template: 
+                "{% if states.input_slider.time_lamp_off_hour and states.input_slider.time_lamp_off_minute %}
+                {{ '%0.02d:%0.02d' | format(states.input_slider.time_lamp_off_hour.state | int, states.input_slider.time_lamp_off_minute.state | int) }}
+                {% else %}
+                n/a
+                {% endif %}"
+        temperature_fan_threshold_value:
+            friendly_name: Temperature threshold
+            #value_template: "{{ states.input_slider.temperature_fan_threshold.state | int }} (+-{{ states.input_slider.temperature_fan_hysteresis.state | int }}) °C"
+            value_template:
+                "{% if states.input_slider.temperature_fan_threshold and states.input_slider.temperature_fan_hysteresis %}
+                {{ states.input_slider.temperature_fan_threshold.state | int }} (+-{{ states.input_slider.temperature_fan_hysteresis.state | int }}) °
+                {% else %}
+                n/a
+                {% endif %}"
+        humidity_fan_threshold_value:
+            friendly_name: Humidity threshold
+            #value_template: "{{ states.input_slider.humidity_fan_threshold.state | int }} (+-{{ states.input_slider.humidity_fan_hysteresis.state | int }}) %"
+            value_template: 
+                "{% if states.input_slider.humidity_fan_threshold and states.input_slider.humidity_fan_hysteresis %}
+                {{ states.input_slider.humidity_fan_threshold.state | int }} (+-{{ states.input_slider.humidity_fan_hysteresis.state | int }}) %
+                {% else %}
+                n/a
+                {% endif %}"
+
+binary_sensor: 
+    - platform: template 
+      sensors:
+        fan:
+            friendly_name: Fan
+            #value_template: "{{ states.switch.fan_value.state == 'on' }}"
+            value_template: 
+                "{% if states.switch.fan_value %}
+                {{ states.switch.fan_value.state == 'on' }}
+                {% else %}
+                n/a
+                {% endif %}"
+            sensor_class: opening
+        lamp:
+            friendly_name: Lamp
+            #value_template: "{{ states.switch.lamp_value.state == 'on' }}" 
+            value_template: 
+                "{% if states.switch.lamp_value %}
+                {{ states.switch.lamp_value.state == 'on' }}
+                {% else %}
+                n/a
+                {% endif %}"
+            sensor_class: light
+        trigger_on_temperature:
+            friendly_name: TrigOnTemp
+            #value_template: "{{ float(states.sensor.hydro_temperature.state) > (float(states.input_slider.temperature_fan_threshold.state) + float(states.input_slider.temperature_fan_hysteresis.state)) }}"
+            value_template: 
+                "{% if states.sensor.hydro_temperature and states.input_slider.temperature_fan_threshold and states.input_slider.temperature_fan_hysteresis %}
+                {{ float(states.sensor.hydro_temperature.state) > (float(states.input_slider.temperature_fan_threshold.state) + float(states.input_slider.temperature_fan_hysteresis.state)) }}
+                {% else %}
+                n/a
+                {% endif %}"
+        #TODO Change condition to '<'
+        trigger_off_temperature:
+            friendly_name: TrigOffTemp
+            #value_template: "{{ float(states.sensor.hydro_temperature.state) > (float(states.input_slider.temperature_fan_threshold.state) - float(states.input_slider.temperature_fan_hysteresis.state)) }}"
+            value_template: 
+                "{% if states.sensor.hydro_temperature and states.input_slider.temperature_fan_threshold and states.input_slider.temperature_fan_hysteresis %}
+                {{ float(states.sensor.hydro_temperature.state) > (float(states.input_slider.temperature_fan_threshold.state) - float(states.input_slider.temperature_fan_hysteresis.state)) }}
+                {% else %}
+                n/a
+                {% endif %}"
+        trigger_on_humidity:
+            friendly_name: TrigOnHum
+            #value_template: "{{ float(states.sensor.hydro_humidity.state) > (float(states.input_slider.humidity_fan_threshold.state) + float(states.input_slider.humidity_fan_hysteresis.state)) }}"
+            value_template: 
+                "{% if states.sensor.hydro_humidity and states.input_slider.humidity_fan_threshold and states.input_slider.humidity_fan_hysteresis %}
+                {{ float(states.sensor.hydro_humidity.state) > (float(states.input_slider.humidity_fan_threshold.state) + float(states.input_slider.humidity_fan_hysteresis.state)) }}
+                {% else %}
+                n/a
+                {% endif %}"
+        #TODO Change condition to '<'
+        trigger_off_humidity:
+            friendly_name: TrigOffHum
+            #value_template: "{{ float(states.sensor.hydro_humidity.state) > (float(states.input_slider.humidity_fan_threshold.state) - float(states.input_slider.humidity_fan_hysteresis.state)) }}"
+            value_template: 
+                "{% if states.sensor.hydro_humidity and states.input_slider.humidity_fan_threshold and states.input_slider.humidity_fan_hysteresis %}
+                {{ float(states.sensor.hydro_humidity.state) > (float(states.input_slider.humidity_fan_threshold.state) - float(states.input_slider.humidity_fan_hysteresis.state)) }}
+                {% else %}
+                n/a
+                {% endif %}"
+
+input_slider:
+  temperature_fan_threshold:
+    name: Temperature threshold(°C)
+    initial: 40
+    min: 10
+    max: 50
+    step: 1
+    icon: mdi:fan
+  humidity_fan_threshold:
+    name: Humidity threshold(%)
+    initial: 40
+    min: 0
+    max: 100
+    step: 1
+    icon: mdi:fan
+  temperature_fan_hysteresis:
+    name: Temperature hysteresis(°C)
+    initial: 1
+    min: 0
+    max: 5
+    step: 1
+    icon: mdi:fan
+  humidity_fan_hysteresis:
+    name: Humidity hysteresis(%)
+    initial: 1
+    min: 0
+    max: 5
+    step: 1
+    icon: mdi:fan
+  time_lamp_on_hour:
+    name: Lamp ON(hour)
+    initial: 12
+    min: 0
+    max: 23
+    step: 1
+    icon: mdi:clock
+  time_lamp_on_minute:
+    name: Lamp ON(min)
+    initial: 1
+    min: 0
+    max: 59
+    step: 1
+    icon: mdi:clock
+  time_lamp_off_hour:
+    name: Lamp OFF(hour)
+    initial: 23
+    min: 0
+    max: 23
+    step: 1
+    icon: mdi:clock
+  time_lamp_off_minute:
+    name: Lamp OFF(min)
+    initial: 1
+    min: 0
+    max: 59
+    step: 1
+    icon: mdi:clock
+ 
+# Services creation
+#shell_command:
+#    set_lamp_on: echo "1" > ~/hass/temp/lamp
+#    set_lamp_off: echo "0" > ~/hass/temp/lamp
+#    set_fan_on: echo "1" > ~/hass/temp/fan
+#    set_fan_off: echo "0" > ~/hass/temp/fan
+
+group:
+  System state:
+    - binary_sensor.lamp
+    - binary_sensor.fan
+    - sensor.hydro_temperature
+    - sensor.hydro_humidity
+    - sensor.time 
+  Override:
+    - input_boolean.override
+    - input_boolean.lamp_control
+    - input_boolean.fan_control
+  Lamp control:
+    - sensor.time_lamp_on
+    - input_slider.time_lamp_on_hour
+    - input_slider.time_lamp_on_minute
+    - sensor.time_lamp_off
+    - input_slider.time_lamp_off_hour
+    - input_slider.time_lamp_off_minute
+  Fan control:
+    - sensor.temperature_fan_threshold_value
+    - input_slider.temperature_fan_threshold
+    - input_slider.temperature_fan_hysteresis
+    - sensor.humidity_fan_threshold_value
+    - input_slider.humidity_fan_threshold
+    - input_slider.humidity_fan_hysteresis
+
+automation: !include_dir_merge_list automation
+
