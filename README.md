@@ -12,3 +12,4 @@ Hass could be started by script **hydro_hass.sh**.
 - Humidity
 
 Novy riadok
+Zmena zo servra
