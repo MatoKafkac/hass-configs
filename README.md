@@ -11,3 +11,4 @@ Hass could be started by script **hydro_hass.sh**.
 - Temperature
 - Humidity
 
+Novy riadok
