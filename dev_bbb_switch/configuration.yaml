@@ -1,0 +1,61 @@
+homeassistant:
+    # Name of the location where Home Assistant is running
+    name: Home
+    # C for Celcius, F for Fahrenheit
+    unit_system: metric
+
+    # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+    time_zone: Europe/Prague
+
+    customize:
+        switch.fan_value:
+            hidden: false
+        switch.lamp_value:
+            hidden: false
+        binary_sensor.trigger_on_temperature:
+            hidden: true
+        binary_sensor.trigger_off_temperature:
+            hidden: true
+        binary_sensor.trigger_on_humidity:
+            hidden: true
+        binary_sensor.trigger_off_humidity:
+            hidden: true
+
+# Enables the frontend
+frontend:
+
+# Checks for available updates
+updater:
+
+# View all events in a logbook
+logbook:
+
+# Allows you to issue voice commands from the frontend
+conversation:
+# Enables support for tracking state changes over time.
+history:
+# Discover some devices automatically
+discovery:
+
+# Show links to resources in log and frontend
+# introduction:
+http:
+  api_password: hovno
+
+
+
+#################################################################
+
+## Components
+
+#################################################################
+switch:
+  - platform: bbb_gpio
+    pins:
+      GPIO0_7:
+        name: LED Red
+      P9_12:
+        name: LED Green
+        initial: true
+        invert_logic: true
+
