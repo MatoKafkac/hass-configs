@@ -195,14 +195,14 @@ binary_sensor:
 input_slider:
   temperature_fan_threshold:
     name: Temperature threshold(°C)
-    initial: 40
+    initial: 26
     min: 10
     max: 50
     step: 1
     icon: mdi:fan
   humidity_fan_threshold:
     name: Humidity threshold(%)
-    initial: 40
+    initial: 26
     min: 0
     max: 100
     step: 1
