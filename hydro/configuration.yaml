@@ -160,8 +160,7 @@ binary_sensor:
                 "{% if states.sensor.hydro_temperature and states.input_slider.temperature_fan_threshold and states.input_slider.temperature_fan_hysteresis %}
                 {{ float(states.sensor.hydro_temperature.state) > (float(states.input_slider.temperature_fan_threshold.state) + float(states.input_slider.temperature_fan_hysteresis.state)) }}
                 {% else %}
-                n/a
-                {% endif %}"
+                n/a {% endif %}"
         #TODO Change condition to '<'
         trigger_off_temperature:
             friendly_name: TrigOffTemp
@@ -202,7 +201,7 @@ input_slider:
     icon: mdi:fan
   humidity_fan_threshold:
     name: Humidity threshold(%)
-    initial: 26
+    initial: 50
     min: 0
     max: 100
     step: 1
