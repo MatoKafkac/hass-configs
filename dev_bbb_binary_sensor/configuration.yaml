@@ -1,0 +1,51 @@
+homeassistant:
+    # Name of the location where Home Assistant is running
+    name: Home
+    # C for Celcius, F for Fahrenheit
+    unit_system: metric
+
+    # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+    time_zone: Europe/Prague
+
+# Enables the frontend
+frontend:
+
+# Checks for available updates
+updater:
+
+# View all events in a logbook
+#logbook:
+
+logger:
+  default: warning
+
+# Allows you to issue voice commands from the frontend
+conversation:
+# Enables support for tracking state changes over time.
+history:
+# Discover some devices automatically
+discovery:
+
+# Show links to resources in log and frontend
+# introduction:
+http:
+  api_password: hovno
+
+
+
+#################################################################
+
+## Components
+
+#################################################################
+switch:
+  - platform: bbb_gpio
+    pins:
+      P8_12:
+        name: Switch
+
+binary_sensor:
+  - platform: bbb_gpio
+    pins:
+      P8_14:
+        name: Sensor
